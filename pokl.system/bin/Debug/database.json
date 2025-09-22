@@ -1,0 +1,32 @@
+[
+  {
+    "Id": "qwe-789",
+    "Name": "chleba",
+    "Weight": 250,
+    "Price": 4.5
+  },
+  {
+    "Id": "cba-4557",
+    "Name": "Kamelky modre",
+    "Weight": 70,
+    "Price": 5
+  },
+  {
+    "Id": "frd-745",
+    "Name": "kekse",
+    "Weight": 300,
+    "Price": 4.7000000000000002
+  },
+  {
+    "Id": "bmxtntcvc-6969",
+    "Name": "krem brule",
+    "Weight": 650,
+    "Price": 17.800000000000001
+  },
+  {
+    "Id": "abc-123",
+    "Name": "Mlieko",
+    "Weight": 1000,
+    "Price": 450
+  }
+]
