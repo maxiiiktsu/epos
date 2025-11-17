@@ -1,0 +1,70 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\mfruh\\source\\repos\\epos\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|c:\\users\\mfruh\\source\\repos\\epos\\epos\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|c:\\users\\mfruh\\source\\repos\\epos\\epos\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|c:\\users\\mfruh\\source\\repos\\epos\\epos\\loginform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\loginform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "LoginForm.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\mfruh\\source\\repos\\epos\\epos\\LoginForm.Designer.cs",
+              "RelativeDocumentMoniker": "epos\\LoginForm.Designer.cs",
+              "ToolTip": "C:\\Users\\mfruh\\source\\repos\\epos\\epos\\LoginForm.Designer.cs",
+              "RelativeToolTip": "epos\\LoginForm.Designer.cs",
+              "ViewState": "AgIAACoAAAAAAAAAAAAuwD8AAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-16T10:17:31.372Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "LoginForm.cs [Design]",
+              "DocumentMoniker": "C:\\Users\\mfruh\\source\\repos\\epos\\epos\\LoginForm.cs",
+              "RelativeDocumentMoniker": "epos\\LoginForm.cs",
+              "ToolTip": "C:\\Users\\mfruh\\source\\repos\\epos\\epos\\LoginForm.cs [Design]",
+              "RelativeToolTip": "epos\\LoginForm.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-16T10:16:05.927Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "LoginForm.cs",
+              "DocumentMoniker": "C:\\Users\\mfruh\\source\\repos\\epos\\epos\\LoginForm.cs",
+              "RelativeDocumentMoniker": "epos\\LoginForm.cs",
+              "ToolTip": "C:\\Users\\mfruh\\source\\repos\\epos\\epos\\LoginForm.cs",
+              "RelativeToolTip": "epos\\LoginForm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAD4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-16T09:52:08.907Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

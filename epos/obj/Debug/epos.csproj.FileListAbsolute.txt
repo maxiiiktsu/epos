@@ -1,0 +1,12 @@
+C:\Users\mfruh\source\repos\epos\epos\obj\Debug\epos.csproj.AssemblyReference.cache
+C:\Users\mfruh\source\repos\epos\epos\obj\Debug\epos.Properties.Resources.resources
+C:\Users\mfruh\source\repos\epos\epos\obj\Debug\epos.csproj.GenerateResource.cache
+C:\Users\mfruh\source\repos\epos\epos\obj\Debug\epos.csproj.CoreCompileInputs.cache
+C:\Users\mfruh\source\repos\epos\epos\bin\Debug\epos.exe.config
+C:\Users\mfruh\source\repos\epos\epos\bin\Debug\epos.exe
+C:\Users\mfruh\source\repos\epos\epos\bin\Debug\epos.pdb
+C:\Users\mfruh\source\repos\epos\epos\bin\Debug\Guna.UI2.dll
+C:\Users\mfruh\source\repos\epos\epos\obj\Debug\epos.csproj.Up2Date
+C:\Users\mfruh\source\repos\epos\epos\obj\Debug\epos.exe
+C:\Users\mfruh\source\repos\epos\epos\obj\Debug\epos.pdb
+C:\Users\mfruh\source\repos\epos\epos\obj\Debug\epos.exe.config
