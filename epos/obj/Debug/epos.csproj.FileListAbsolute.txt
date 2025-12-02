@@ -52,3 +52,13 @@ C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\Syste
 C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\System.Numerics.Vectors.xml
 C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\System.Threading.Tasks.Extensions.xml
+C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\AForge.dll
+C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\AForge.Video.DirectShow.dll
+C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\AForge.Video.dll
+C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\zxing.dll
+C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\zxing.presentation.dll
+C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\AForge.xml
+C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\AForge.Video.xml
+C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\AForge.Video.DirectShow.xml
+C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\zxing.xml
+C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\zxing.presentation.xml

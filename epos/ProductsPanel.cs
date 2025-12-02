@@ -14,7 +14,7 @@ namespace epos
             InitializeComponent();
         }
 
-        // volaj z Form1 pri otvorení Products
+        
         public void RefreshProducts()
         {
             ShowListView();
@@ -86,7 +86,7 @@ namespace epos
                 }
                 catch
                 {
-                    // ak sa nepodarí načítať, necháme prázdne
+                    
                 }
             }
 
@@ -316,7 +316,7 @@ namespace epos
                 }
 
                 selectedProductId = null;
-                RefreshProducts();   // zároveň prepne na list view
+                RefreshProducts();   
             }
             catch (Exception ex)
             {

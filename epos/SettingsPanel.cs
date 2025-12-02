@@ -1,45 +1,38 @@
 ﻿using System;
 using System.Windows.Forms;
-
-// SAFE optional import – if AForge is missing, app still compiles
-#if AFORGE
 using AForge.Video.DirectShow;
-#endif
+using MySql.Data.MySqlClient;
 
 namespace epos
 {
     public partial class SettingsPanel : UserControl
     {
-#if AFORGE
         private FilterInfoCollection cameras;
-#endif
+
+        
+        public event Action<int> CameraChanged;
 
         public SettingsPanel()
         {
             InitializeComponent();
 
-            // try loading cameras but do not crash if AForge is missing
-            SafeLoadCameras();
+            LoadCameras();
+
+            
+            cmbCameras.SelectedIndexChanged += CmbCameras_SelectedIndexChanged;
         }
 
-        private void SafeLoadCameras()
+        private void LoadCameras()
         {
-            // If AForge is not installed → handle gracefully
-#if !AFORGE
-            cmbCameras.Items.Clear();
-            cmbCameras.Items.Add("Kamera modul nie je nainštalovaný");
-            cmbCameras.SelectedIndex = 0;
-            return;
-#else
             try
             {
                 cameras = new FilterInfoCollection(FilterCategory.VideoInputDevice);
 
                 cmbCameras.Items.Clear();
-                cmbCameras.Items.Add("Vyberte kameru");
+                cmbCameras.Items.Add("Vyberte kameru");  
 
                 foreach (FilterInfo cam in cameras)
-                    cmbCameras.Items.Add(cam.Name);
+                    cmbCameras.Items.Add(cam.Name);      
 
                 cmbCameras.SelectedIndex = 0;
             }
@@ -49,8 +42,31 @@ namespace epos
                 cmbCameras.Items.Add("Žiadne kamery");
                 cmbCameras.SelectedIndex = 0;
             }
-#endif
         }
+
+        
+        public void RefreshCameras()
+        {
+            LoadCameras();
+        }
+
+        private void CmbCameras_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cameras == null || cameras.Count == 0)
+                return;
+
+            
+            if (cmbCameras.SelectedIndex <= 0)
+                return;
+
+            
+            int cameraIndex = cmbCameras.SelectedIndex - 1;
+
+            
+            CameraChanged?.Invoke(cameraIndex);
+        }
+
+        // ================= ZMENA KÓDU POKLADNÍKA =================
 
         private void btnSavePassword_Click(object sender, EventArgs e)
         {
@@ -63,15 +79,53 @@ namespace epos
                 return;
             }
 
-            // === predpríprava na databázu ===
-            // tu neskôr doplníme DB logiku:
-            // 1. check if oldCode matches DB
-            // 2. update new code
+            try
+            {
+                using (var conn = Database.GetConnection())
+                {
+                    conn.Open();
 
-            MessageBox.Show("Kód pokladníka bol zmenený (demo).",
-                "Hotovo",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information);
+                    
+                    string checkSql = "SELECT id FROM cashiers WHERE code = @old LIMIT 1";
+                    int? cashierId = null;
+
+                    using (var checkCmd = new MySqlCommand(checkSql, conn))
+                    {
+                        checkCmd.Parameters.AddWithValue("@old", oldCode);
+                        object result = checkCmd.ExecuteScalar();
+
+                        if (result == null || result == DBNull.Value)
+                        {
+                            MessageBox.Show("Pôvodný kód nesedí.", "Chyba",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        cashierId = Convert.ToInt32(result);
+                    }
+
+                    
+                    string updateSql = "UPDATE cashiers SET code = @new WHERE id = @id";
+
+                    using (var updateCmd = new MySqlCommand(updateSql, conn))
+                    {
+                        updateCmd.Parameters.AddWithValue("@new", newCode);
+                        updateCmd.Parameters.AddWithValue("@id", cashierId.Value);
+                        updateCmd.ExecuteNonQuery();
+                    }
+                }
+
+                MessageBox.Show("Kód pokladníka bol zmenený.", "Hotovo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                txtOldCode.Text = "";
+                txtNewCode.Text = "";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Chyba pri práci s databázou: " + ex.Message,
+                    "DB chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

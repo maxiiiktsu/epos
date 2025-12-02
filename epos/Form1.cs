@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using MySql.Data.MySqlClient;
 
 namespace epos
 {
@@ -12,18 +13,21 @@ namespace epos
 
         private Control currentPanel;
 
-        // NAVBAR underline + aktívny button
+        
         private Panel underline;
         private Guna.UI2.WinForms.Guna2Button activeButton;
 
         private Timer underlineAnimTimer;
         private int targetUnderlineX;
 
+        
+        private BarcodeScanner scanner;
+
         public Form1()
         {
             InitializeComponent();
 
-            // skryť staré tlačidlo Remove Item (už ho nepoužívame)
+            
             btnRemoveItem.Visible = false;
 
             // SETTINGS PANEL
@@ -31,6 +35,10 @@ namespace epos
             settingsPanel.Visible = false;
             backgroundPanel.Controls.Add(settingsPanel);
             settingsPanel.BringToFront();
+
+            
+            settingsPanel.CameraChanged += OnCameraChanged;
+
 
             // ADD ITEM PANEL
             addItemPanel = new AddItemPanel();
@@ -65,14 +73,36 @@ namespace epos
             // START WITH HOME ACTIVE
             SetActiveButton(btnHome);
 
+            // layout
             LayoutUi();
             Resize += (_, __) => LayoutUi();
             Shown += (_, __) => LayoutUi();
+
+            // ====== SCANNER ======
+            try
+            {
+                scanner = new BarcodeScanner(null); 
+                scanner.BarcodeDetected += OnBarcodeDetected;
+                scanner.Start(0); 
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Nepodarilo sa spustiť kameru: " + ex.Message,
+                    "Kamera", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            scanner?.Dispose();
+            base.OnFormClosing(e);
         }
 
         // ===========================================================
         // NAVBAR EVENTS
         // ===========================================================
+
 
         private void HookNavbarEvents()
         {
@@ -118,7 +148,7 @@ namespace epos
             // centrovanie
             targetUnderlineX = btn.Left + (btn.Width - underline.Width) / 2;
 
-            // animácia
+            
             underlineAnimTimer.Start();
         }
 
@@ -139,6 +169,78 @@ namespace epos
 
             underline.Top = activeButton.Bottom + 2;
         }
+
+        // ===========================================================
+        // BARCODE HANDLER (pozadie)
+        // ===========================================================
+
+        private void OnBarcodeDetected(string code)
+        {
+            
+            if (InvokeRequired)
+            {
+                BeginInvoke(new Action(() => OnBarcodeDetected(code)));
+                return;
+            }
+
+            
+            if (currentPanel != null)
+                return;
+
+            lblBarcodeValue.Text = code;
+
+            try
+            {
+                using (var conn = Database.GetConnection())
+                {
+                    conn.Open();
+
+                    string sql = "SELECT name, price FROM products WHERE barcode = @code LIMIT 1";
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@code", code);
+
+                        using (var rd = cmd.ExecuteReader())
+                        {
+                            if (rd.Read())
+                            {
+                                string name = rd.GetString("name");
+                                decimal price = rd.GetDecimal("price");
+
+                                lblNameValue.Text = name;
+                                lblPriceValue.Text = price.ToString("0.00") + " €";
+                                lblCountValue.Text = "1";
+                            }
+                            else
+                            {
+                                lblNameValue.Text = "Neznámy produkt";
+                                lblPriceValue.Text = "-";
+                                lblCountValue.Text = "-";
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Chyba databázy pri hľadaní produktu: " + ex.Message,
+                    "DB chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void OnCameraChanged(int cameraIndex)
+        {
+            try
+            {
+                scanner?.Start(cameraIndex);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Nepodarilo sa prepnúť kameru: " + ex.Message,
+                    "Kamera", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
 
         // ===========================================================
         // PANEL SWITCHING
@@ -181,11 +283,11 @@ namespace epos
             btnHome.Location = new Point(40, topPadding);
             btnSettings.Location = new Point(150, topPadding);
             btnAddItem.Location = new Point(260, topPadding);
-            btnProducts.Location = new Point(380, topPadding); // Products ide na miesto RemoveItem
+            btnProducts.Location = new Point(380, topPadding); 
 
             btnLogout.Location = new Point(w - btnLogout.Width - 40, topPadding);
 
-            // UPDATE underline position after resize
+            
             if (activeButton != null)
             {
                 underline.Width = (int)(activeButton.Width * 0.45);
@@ -232,7 +334,7 @@ namespace epos
             }
             else
             {
-                // schovať HOME prvky
+                
                 lblTitle.Visible = false;
                 lblBarcode.Visible = false;
                 lblBarcodeValue.Visible = false;

@@ -4,7 +4,7 @@ namespace epos
 {
     public static class Database
     {
-        // podľa tvojho lokálneho setupu
+        
         private static string host = "localhost";
         private static string user = "root";
         private static string password = ""; // ak máš heslo, doplň sem
