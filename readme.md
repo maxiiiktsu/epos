@@ -1,0 +1,1 @@
+design -https://www.figma.com/design/dlUSdwKMuQUGK8Atg5t6p2/epos?node-id=0-1&t=9K7EuuNxUo4T06IE-1

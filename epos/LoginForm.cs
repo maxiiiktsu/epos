@@ -59,12 +59,12 @@ namespace epos
 
         private void ShowError(string message)
         {
-            // text
+            
             lblError.Text = message;
             lblError.ForeColor = errorColor;
             lblError.Visible = true;
 
-            // červený rámček okolo textboxu (aj fokus/hover)
+            // červený rámček okolo textboxu (focus/hover)
             txtCode.BorderColor = errorColor;
             txtCode.FocusedState.BorderColor = errorColor;
             txtCode.HoverState.BorderColor = errorColor;
@@ -80,7 +80,7 @@ namespace epos
             txtCode.HoverState.BorderColor = defaultBorderColor;
         }
 
-        // ====== LOGIN CLICK – napojené na DB ======
+        // ====== LOGIN CLICK ======
         private void BtnLogin_Click(object sender, EventArgs e)
         {
             ClearError();
@@ -110,7 +110,7 @@ namespace epos
 
                         if (result == null || result == DBNull.Value)
                         {
-                            // kód neexistuje
+                            
                             ShowError("Zadali ste nesprávny kód");
                             txtCode.SelectAll();
                             txtCode.Focus();

@@ -7,7 +7,7 @@ namespace epos
         
         private static string host = "localhost";
         private static string user = "root";
-        private static string password = ""; // ak máš heslo, doplň sem
+        private static string password = ""; 
         private static string database = "epos";
 
         // ŽIADNE SslMode, žiadne extra parametre
