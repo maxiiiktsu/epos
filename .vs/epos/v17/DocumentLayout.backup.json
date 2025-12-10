@@ -3,20 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\productspanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\productspanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|c:\\users\\mfruh\\documents\\programovaine\\git_repo_csharp\\epos\\epos\\manualaddform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\manualaddform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\database.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\database.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|c:\\users\\mfruh\\documents\\programovaine\\git_repo_csharp\\epos\\epos\\productspanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\productspanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\barcodescanner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\barcodescanner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\windowsfontresolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\windowsfontresolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\loginform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -29,18 +29,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\productspanel.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\productspanel.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|c:\\users\\mfruh\\documents\\programovaine\\git_repo_csharp\\epos\\epos\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\settingspanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\settingspanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\settingspanel.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\settingspanel.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\additempanel.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -66,69 +54,30 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 9,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "WindowsFontResolver.cs",
-              "DocumentMoniker": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\WindowsFontResolver.cs",
-              "RelativeDocumentMoniker": "epos\\WindowsFontResolver.cs",
-              "ToolTip": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\WindowsFontResolver.cs",
-              "RelativeToolTip": "epos\\WindowsFontResolver.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAJAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "ManualAddForm.cs",
+              "DocumentMoniker": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\ManualAddForm.cs",
+              "RelativeDocumentMoniker": "epos\\ManualAddForm.cs",
+              "ToolTip": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\ManualAddForm.cs",
+              "RelativeToolTip": "epos\\ManualAddForm.cs",
+              "ViewState": "AgIAABsBAAAAAAAAAIA3wC8BAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-09T10:04:45.573Z",
+              "WhenOpened": "2025-12-10T13:47:43.879Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "Database.cs",
-              "DocumentMoniker": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\Database.cs",
-              "RelativeDocumentMoniker": "epos\\Database.cs",
-              "ToolTip": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\Database.cs",
-              "RelativeToolTip": "epos\\Database.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAvAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-17T12:22:02.582Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "SettingsPanel.Designer.cs",
-              "DocumentMoniker": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\SettingsPanel.Designer.cs",
-              "RelativeDocumentMoniker": "epos\\SettingsPanel.Designer.cs",
-              "ToolTip": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\SettingsPanel.Designer.cs",
-              "RelativeToolTip": "epos\\SettingsPanel.Designer.cs",
-              "ViewState": "AgIAAEgAAAAAAAAAAAAowDAAAAAbAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-17T11:56:49.154Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "SettingsPanel.cs",
-              "DocumentMoniker": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\SettingsPanel.cs",
-              "RelativeDocumentMoniker": "epos\\SettingsPanel.cs",
-              "ToolTip": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\SettingsPanel.cs",
-              "RelativeToolTip": "epos\\SettingsPanel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-17T11:56:26.269Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
               "Title": "Form1.cs",
               "DocumentMoniker": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\Form1.cs",
               "RelativeDocumentMoniker": "epos\\Form1.cs",
               "ToolTip": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\Form1.cs",
               "RelativeToolTip": "epos\\Form1.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAkAAAAAAAAAA==",
+              "ViewState": "AgIAAEoBAAAAAAAAAAAQwGgBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-17T11:47:02.535Z",
               "EditorCaption": ""
@@ -143,8 +92,7 @@
               "RelativeToolTip": "epos\\ProductsPanel.Designer.cs",
               "ViewState": "AgIAAHIAAAAAAAAAAAAowLgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-17T13:06:33.742Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-17T13:06:33.742Z"
             },
             {
               "$type": "Document",
@@ -155,8 +103,7 @@
               "ToolTip": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\SettingsPanel.cs [Design]",
               "RelativeToolTip": "epos\\SettingsPanel.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-17T11:56:14.939Z",
-              "EditorCaption": " [Design]"
+              "WhenOpened": "2025-11-17T11:56:14.939Z"
             },
             {
               "$type": "Document",
@@ -168,12 +115,11 @@
               "RelativeToolTip": "epos\\LoginForm.cs",
               "ViewState": "AgIAAF8AAAAAAAAAAAAAwHAAAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-16T09:52:08.907Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-16T09:52:08.907Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "BarcodeScanner.cs",
               "DocumentMoniker": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\BarcodeScanner.cs",
               "RelativeDocumentMoniker": "epos\\BarcodeScanner.cs",
@@ -181,25 +127,24 @@
               "RelativeToolTip": "epos\\BarcodeScanner.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAHsAAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-02T13:37:10.52Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-12-02T13:37:10.52Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "ProductsPanel.cs",
               "DocumentMoniker": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\ProductsPanel.cs",
               "RelativeDocumentMoniker": "epos\\ProductsPanel.cs",
               "ToolTip": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\ProductsPanel.cs",
               "RelativeToolTip": "epos\\ProductsPanel.cs",
-              "ViewState": "AgIAAGgAAAAAAAAAAAAIwC0BAAAoAAAAAAAAAA==",
+              "ViewState": "AgIAACwAAAAAAAAAAAAwwHgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-17T13:06:12.66Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 7,
               "Title": "AddItemPanel.Designer.cs",
               "DocumentMoniker": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\AddItemPanel.Designer.cs",
               "RelativeDocumentMoniker": "epos\\AddItemPanel.Designer.cs",
@@ -207,24 +152,22 @@
               "RelativeToolTip": "epos\\AddItemPanel.Designer.cs",
               "ViewState": "AgIAAFcAAAAAAAAAAAAowG4AAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-17T12:15:58.836Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-17T12:15:58.836Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 8,
               "Title": "LoginForm.cs [Design]",
               "DocumentMoniker": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\LoginForm.cs",
               "RelativeDocumentMoniker": "epos\\LoginForm.cs",
               "ToolTip": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\LoginForm.cs [Design]",
               "RelativeToolTip": "epos\\LoginForm.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-16T10:16:05.927Z",
-              "EditorCaption": " [Design]"
+              "WhenOpened": "2025-11-16T10:16:05.927Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 9,
               "Title": "AddItemPanel.cs",
               "DocumentMoniker": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\AddItemPanel.cs",
               "RelativeDocumentMoniker": "epos\\AddItemPanel.cs",
@@ -236,7 +179,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 10,
               "Title": "Form1.Designer.cs",
               "DocumentMoniker": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\Form1.Designer.cs",
               "RelativeDocumentMoniker": "epos\\Form1.Designer.cs",
@@ -244,8 +187,7 @@
               "RelativeToolTip": "epos\\Form1.Designer.cs",
               "ViewState": "AgIAALkAAAAAAAAAAAAcwNcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-17T11:39:39.032Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-17T11:39:39.032Z"
             }
           ]
         }

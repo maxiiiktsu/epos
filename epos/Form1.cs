@@ -52,7 +52,9 @@ namespace epos
             WindowsFontResolver.Apply();
             InitializeComponent();
 
-            
+            btnAddManual.Click += btnAddManual_Click;
+
+
             receiptTextBox = new Guna.UI2.WinForms.Guna2TextBox
             {
                 Dock = DockStyle.Fill,
@@ -147,7 +149,7 @@ namespace epos
             }
         }
 
-        // pri zatvorení vypneme kameru
+        
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             scanner?.Dispose();
@@ -245,6 +247,27 @@ namespace epos
         // BARCODE HANDLER
         // ===========================================================
 
+        private void btnAddManual_Click(object sender, EventArgs e)
+        {
+            using (var dlg = new ManualAddForm())
+            {
+                if (dlg.ShowDialog(this) == DialogResult.OK && dlg.SelectedProduct != null)
+                {
+                    var p = dlg.SelectedProduct;
+
+                    
+                    AddItemToReceipt(p.Barcode, p.Name, p.UnitPrice, p.Quantity);
+
+                    
+                    lblBarcodeValue.Text = p.Barcode;
+                    lblNameValue.Text = p.Name;
+                    lblCountValue.Text = p.Quantity.ToString();
+                    lblPriceValue.Text = p.UnitPrice.ToString("0.00") + " €";
+                }
+            }
+        }
+
+
         private void OnBarcodeDetected(string code)
         {
             
@@ -306,13 +329,21 @@ namespace epos
         // BLOČEK – manipulácia s položkami
         // ===========================================================
 
+        
         private void AddItemToReceipt(string barcode, string name, decimal price)
         {
-            // ak už produkt v bločku je → zvýšime množstvo
+            AddItemToReceipt(barcode, name, price, 1);
+        }
+
+        
+        private void AddItemToReceipt(string barcode, string name, decimal price, int quantity)
+        {
+            if (quantity <= 0) quantity = 1;
+
             var existing = receiptItems.FirstOrDefault(i => i.Barcode == barcode);
             if (existing != null)
             {
-                existing.Quantity++;
+                existing.Quantity += quantity;
             }
             else
             {
@@ -321,12 +352,13 @@ namespace epos
                     Barcode = barcode,
                     Name = name,
                     UnitPrice = price,
-                    Quantity = 1
+                    Quantity = quantity
                 });
             }
 
             UpdateReceiptText();
         }
+
 
         private void UpdateReceiptText()
         {
