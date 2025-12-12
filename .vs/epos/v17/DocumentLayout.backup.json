@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|c:\\users\\mfruh\\documents\\programovaine\\git_repo_csharp\\epos\\epos\\manualaddform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\manualaddform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|c:\\users\\mfruh\\documents\\programovaine\\git_repo_csharp\\epos\\epos\\manualaddform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|solutionrelative:epos\\manualaddform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{B123A8C1-0D54-4E1E-9470-E3A0A2A7986E}|epos\\epos.csproj|c:\\users\\mfruh\\documents\\programovaine\\git_repo_csharp\\epos\\epos\\productspanel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -54,30 +54,30 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "ManualAddForm.cs",
               "DocumentMoniker": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\ManualAddForm.cs",
               "RelativeDocumentMoniker": "epos\\ManualAddForm.cs",
               "ToolTip": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\ManualAddForm.cs",
               "RelativeToolTip": "epos\\ManualAddForm.cs",
-              "ViewState": "AgIAABsBAAAAAAAAAIA3wC8BAAAsAAAAAAAAAA==",
+              "ViewState": "AgIAAJYBAAAAAAAAAAAIwAoAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-10T13:47:43.879Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Form1.cs",
               "DocumentMoniker": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\Form1.cs",
               "RelativeDocumentMoniker": "epos\\Form1.cs",
               "ToolTip": "C:\\Users\\mfruh\\Documents\\programovaine\\git_repo_csharp\\epos\\epos\\Form1.cs",
               "RelativeToolTip": "epos\\Form1.cs",
-              "ViewState": "AgIAAEoBAAAAAAAAAAAQwGgBAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-17T11:47:02.535Z",
               "EditorCaption": ""

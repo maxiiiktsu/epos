@@ -15,7 +15,6 @@ C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\epos.
 C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\epos.pdb
 C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\Guna.UI2.dll
 C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\obj\Debug\epos.csproj.AssemblyReference.cache
-C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\obj\Debug\epos.exe.config
 C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\obj\Debug\epos.Properties.Resources.resources
 C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\obj\Debug\epos.csproj.GenerateResource.cache
 C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\obj\Debug\epos.csproj.CoreCompileInputs.cache
