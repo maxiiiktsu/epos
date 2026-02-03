@@ -120,7 +120,7 @@ namespace epos
                 }
 
                 
-                var main = new Form1();
+                var main = new Form1(code);
                 main.FormClosed += (_, __) => Application.Exit();
 
                 Hide();

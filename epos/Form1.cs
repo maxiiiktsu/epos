@@ -8,7 +8,6 @@ using PdfSharp.Pdf;
 using PdfSharp.Drawing;
 using PdfSharp.Fonts;
 
-
 namespace epos
 {
     public partial class Form1 : Form
@@ -16,6 +15,7 @@ namespace epos
         private SettingsPanel settingsPanel;
         private AddItemPanel addItemPanel;
         private ProductsPanel productsPanel;
+        private string cashierCode;
 
         private Control currentPanel;
 
@@ -26,13 +26,9 @@ namespace epos
         private Timer underlineAnimTimer;
         private int targetUnderlineX;
 
-        
         private BarcodeScanner scanner;
 
-        
         private Guna.UI2.WinForms.Guna2TextBox receiptTextBox;
-
-        
         private Guna.UI2.WinForms.Guna2Button btnPrintReceipt;
 
         // ====== BLOČEK ======
@@ -42,19 +38,36 @@ namespace epos
             public string Name;
             public decimal UnitPrice;
             public int Quantity;
+            public decimal VatRate; // napr. 23.00
+
         }
 
         private readonly System.Collections.Generic.List<ReceiptItem> receiptItems =
             new System.Collections.Generic.List<ReceiptItem>();
 
-        public Form1()
+        // ====== IMAGE PREVIEW ======
+        private PictureBox productPicture;
+
+        // debounce proti opakovaným frame-scanom
+        private string lastScannedCode = null;
+        private DateTime lastScanAt = DateTime.MinValue;
+
+        // ===== HOME GRID (kompaktné bunky) =====
+        private TableLayoutPanel homeRoot;
+        private BorderPanel infoCell;
+        private BorderPanel imageCell;
+        private BorderPanel receiptCell;
+
+        public Form1(string cashierCode)
         {
+            this.cashierCode = cashierCode;
             WindowsFontResolver.Apply();
             InitializeComponent();
 
-            btnAddManual.Click += btnAddManual_Click;
+            // skryť staré RemoveItem
+            btnRemoveItem.Visible = false;
 
-
+            // ===== receipt textbox (do receiptPreview) =====
             receiptTextBox = new Guna.UI2.WinForms.Guna2TextBox
             {
                 Dock = DockStyle.Fill,
@@ -71,12 +84,12 @@ namespace epos
             receiptPreview.FillColor = Color.White;
             receiptPreview.Controls.Add(receiptTextBox);
 
-            // print btn
+            // ===== print button (bude v HOME bunke) =====
             btnPrintReceipt = new Guna.UI2.WinForms.Guna2Button
             {
                 Text = "Tlačiť bloček",
                 BorderRadius = 8,
-                Size = new Size(140, 40),
+                Size = new Size(220, 44),
                 FillColor = Color.Black,
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
@@ -84,32 +97,32 @@ namespace epos
                 Visible = true
             };
             btnPrintReceipt.Click += BtnPrintReceipt_Click;
-            backgroundPanel.Controls.Add(btnPrintReceipt);
-            btnPrintReceipt.BringToFront();
 
-            
-            btnRemoveItem.Visible = false;
+            // ===== product image preview (bude v HOME bunke) =====
+            productPicture = new PictureBox
+            {
+                BackColor = Color.FromArgb(25, 25, 25),   // tmavé = ladí s UI
+                SizeMode = PictureBoxSizeMode.Zoom,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(12)                 // menší „rámik“, nie veľký blok
+            };
 
-            // SETTINGS PANEL
-            settingsPanel = new SettingsPanel();
-            settingsPanel.Visible = false;
+
+            // ===== PANELY =====
+            settingsPanel = new SettingsPanel { Visible = false };
             backgroundPanel.Controls.Add(settingsPanel);
             settingsPanel.BringToFront();
             settingsPanel.CameraChanged += OnCameraChanged;
 
-            // ADD ITEM PANEL
-            addItemPanel = new AddItemPanel();
-            addItemPanel.Visible = false;
+            addItemPanel = new AddItemPanel { Visible = false };
             backgroundPanel.Controls.Add(addItemPanel);
             addItemPanel.BringToFront();
 
-            // PRODUCTS PANEL
-            productsPanel = new ProductsPanel();
-            productsPanel.Visible = false;
+            productsPanel = new ProductsPanel { Visible = false };
             backgroundPanel.Controls.Add(productsPanel);
             productsPanel.BringToFront();
 
-            // UNDERLINE panel
+            // ===== UNDERLINE =====
             underline = new Panel
             {
                 Height = 2,
@@ -118,19 +131,21 @@ namespace epos
                 Visible = false
             };
             backgroundPanel.Controls.Add(underline);
+            underline.BringToFront();
 
-            // ANIMATION TIMER
-            underlineAnimTimer = new Timer();
-            underlineAnimTimer.Interval = 10;
+            underlineAnimTimer = new Timer { Interval = 10 };
             underlineAnimTimer.Tick += AnimateUnderline;
 
-            // NAVBAR EVENTS
             HookNavbarEvents();
-
-            
             SetActiveButton(btnHome);
 
-            
+            // ===== HOME GRID vybuduj raz =====
+            BuildHomeGrid();
+
+            // klik na manuálne pridanie
+            btnAddManual.Click += btnAddManual_Click;
+
+            // layout
             LayoutUi();
             Resize += (_, __) => LayoutUi();
             Shown += (_, __) => LayoutUi();
@@ -138,22 +153,197 @@ namespace epos
             // ====== SCANNER ======
             try
             {
-                scanner = new BarcodeScanner(null); 
+                scanner = new BarcodeScanner(null);
                 scanner.BarcodeDetected += OnBarcodeDetected;
-                scanner.Start(0); 
+                scanner.Start(0);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Nepodarilo sa spustiť kameru: " + ex.Message,
                     "Kamera", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+
+            this.cashierCode = cashierCode;
         }
 
-        
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             scanner?.Dispose();
             base.OnFormClosing(e);
+        }
+
+        // ===========================================================
+        // HOME GRID BUILD
+        // ===========================================================
+
+        // Jemný border panel (subtle)
+        private class BorderPanel : Panel
+        {
+            public Color BorderColor { get; set; } = Color.FromArgb(55, 255, 255, 255); // jemná biela
+            public int BorderThickness { get; set; } = 1;
+
+            public BorderPanel()
+            {
+                DoubleBuffered = true;
+                BackColor = Color.Transparent;
+                Padding = new Padding(14);
+            }
+
+            protected override void OnPaint(PaintEventArgs e)
+            {
+                base.OnPaint(e);
+                using (var pen = new Pen(BorderColor, BorderThickness))
+                {
+                    var r = ClientRectangle;
+                    r.Width -= 1;
+                    r.Height -= 1;
+                    e.Graphics.DrawRectangle(pen, r);
+                }
+            }
+        }
+
+        private void BuildHomeGrid()
+        {
+            if (homeRoot != null) return;
+
+            // hlavná mriežka: Info | Image | Receipt
+            homeRoot = new TableLayoutPanel
+            {
+                ColumnCount = 3,
+                RowCount = 1,
+                Dock = DockStyle.None,
+                BackColor = Color.Transparent
+            };
+
+            // Percentá tak, aby bol bloček dominantný a obrázok veľký
+            homeRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34f)); // info + tlačidlá
+            homeRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 28f)); // obrázok
+            homeRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 38f)); // bloček
+
+            homeRoot.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
+
+            // bunky s jemným borderom
+            infoCell = new BorderPanel();
+            imageCell = new BorderPanel
+            {
+                BorderColor = Color.FromArgb(40, 255, 255, 255), // oveľa jemnejší border
+                BackColor = Color.FromArgb(18, 18, 18)           // tmavé pozadie bunky
+            };
+
+            receiptCell = new BorderPanel();
+
+            homeRoot.Controls.Add(infoCell, 0, 0);
+            homeRoot.Controls.Add(imageCell, 1, 0);
+            homeRoot.Controls.Add(receiptCell, 2, 0);
+
+            infoCell.Dock = DockStyle.Fill;
+            imageCell.Dock = DockStyle.Fill;
+            receiptCell.Dock = DockStyle.Fill;
+
+            // ---- INFO CELL obsah (table) ----
+            var infoTable = new TableLayoutPanel
+            {
+                ColumnCount = 2,
+                RowCount = 7,
+                Dock = DockStyle.Fill,
+                BackColor = Color.Transparent
+            };
+            infoTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 110)); // názov
+            infoTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));  // hodnota
+
+            // Title (span 2)
+            infoTable.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // title
+            infoTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 14)); // spacer
+            infoTable.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // barcode
+            infoTable.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // name
+            infoTable.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // count
+            infoTable.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // price
+            infoTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); // bottom space + buttons
+
+            // pripraviť existujúce labely (z dizajnu) aby sedeli v tabuľke
+            lblTitle.Dock = DockStyle.Top;
+            lblTitle.Margin = new Padding(0, 0, 0, 0);
+
+            // Title do 0. riadku, span 2
+            infoTable.Controls.Add(lblTitle, 0, 0);
+            infoTable.SetColumnSpan(lblTitle, 2);
+
+            // barcode row
+            lblBarcode.Dock = DockStyle.Top;
+            lblBarcodeValue.Dock = DockStyle.Top;
+            lblBarcodeValue.Margin = new Padding(0, 0, 0, 10);
+
+            infoTable.Controls.Add(lblBarcode, 0, 2);
+            infoTable.Controls.Add(lblBarcodeValue, 1, 2);
+
+            // name row
+            lblName.Dock = DockStyle.Top;
+            lblNameValue.Dock = DockStyle.Top;
+            lblNameValue.Margin = new Padding(0, 0, 0, 10);
+
+            infoTable.Controls.Add(lblName, 0, 3);
+            infoTable.Controls.Add(lblNameValue, 1, 3);
+
+            // count row
+            lblCount.Dock = DockStyle.Top;
+            lblCountValue.Dock = DockStyle.Top;
+            lblCountValue.Margin = new Padding(0, 0, 0, 10);
+
+            infoTable.Controls.Add(lblCount, 0, 4);
+            infoTable.Controls.Add(lblCountValue, 1, 4);
+
+            // price row
+            lblPrice.Dock = DockStyle.Top;
+            lblPriceValue.Dock = DockStyle.Top;
+            lblPriceValue.Margin = new Padding(0, 0, 0, 10);
+
+            infoTable.Controls.Add(lblPrice, 0, 5);
+            infoTable.Controls.Add(lblPriceValue, 1, 5);
+
+            // Buttons (vložíme do posledného riadku ako Flow)
+            var buttonsFlow = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Bottom,
+                FlowDirection = FlowDirection.TopDown,
+                WrapContents = false,
+                AutoSize = true,
+                BackColor = Color.Transparent,
+                Padding = new Padding(0),
+                Margin = new Padding(0, 12, 0, 0)
+            };
+
+            // existujúci btnAddManual je z dizajnu - nechaj ho, len ho vlož do flow
+            btnAddManual.Width = 220;
+            btnAddManual.Height = 44;
+
+            buttonsFlow.Controls.Add(btnAddManual);
+            buttonsFlow.Controls.Add(btnPrintReceipt);
+
+            // dáme flow do infoCell cez panel, aby sedel dole
+            var infoHost = new Panel { Dock = DockStyle.Fill, BackColor = Color.Transparent };
+            infoHost.Controls.Add(infoTable);
+            infoHost.Controls.Add(buttonsFlow);
+
+            infoCell.Controls.Add(infoHost);
+
+            // ---- IMAGE CELL ----
+            imageCell.Controls.Add(productPicture);
+
+            // ---- RECEIPT CELL ----
+            receiptPreview.Dock = DockStyle.Fill;
+            receiptCell.Controls.Add(receiptPreview);
+
+            // pripojiť homeRoot do backgroundPanelu (pod navbar)
+            backgroundPanel.Controls.Add(homeRoot);
+            homeRoot.BringToFront();
+
+            // navbar musí byť nad tým
+            btnHome.BringToFront();
+            btnSettings.BringToFront();
+            btnAddItem.BringToFront();
+            btnProducts.BringToFront();
+            btnLogout.BringToFront();
+            underline.BringToFront();
         }
 
         // ===========================================================
@@ -195,16 +385,11 @@ namespace epos
         private void SetActiveButton(Guna.UI2.WinForms.Guna2Button btn)
         {
             activeButton = btn;
-
             underline.Visible = true;
 
-            // underline = 45 % šírky tlačidla
             underline.Width = (int)(btn.Width * 0.45);
-
-            // centrovanie
             targetUnderlineX = btn.Left + (btn.Width - underline.Width) / 2;
 
-            // animácia
             underlineAnimTimer.Start();
         }
 
@@ -244,7 +429,7 @@ namespace epos
         }
 
         // ===========================================================
-        // BARCODE HANDLER
+        // MANUAL ADD
         // ===========================================================
 
         private void btnAddManual_Click(object sender, EventArgs e)
@@ -255,29 +440,65 @@ namespace epos
                 {
                     var p = dlg.SelectedProduct;
 
-                    
                     AddItemToReceipt(p.Barcode, p.Name, p.UnitPrice, p.Quantity);
 
-                    
                     lblBarcodeValue.Text = p.Barcode;
                     lblNameValue.Text = p.Name;
-                    lblCountValue.Text = p.Quantity.ToString();
+                    lblCountValue.Text = GetQuantityForBarcode(p.Barcode).ToString();
                     lblPriceValue.Text = p.UnitPrice.ToString("0.00") + " €";
+
+                    string img = TryGetSelectedProductImage(p);
+                    SetProductImage(img);
                 }
             }
         }
 
+        private string TryGetSelectedProductImage(object selectedProduct)
+        {
+            try
+            {
+                var t = selectedProduct.GetType();
+
+                var p1 = t.GetProperty("ImageUrl");
+                if (p1 != null)
+                {
+                    var v = p1.GetValue(selectedProduct) as string;
+                    if (!string.IsNullOrWhiteSpace(v)) return v;
+                }
+
+                var p2 = t.GetProperty("Image");
+                if (p2 != null)
+                {
+                    var v = p2.GetValue(selectedProduct) as string;
+                    if (!string.IsNullOrWhiteSpace(v)) return v;
+                }
+            }
+            catch { }
+
+            return null;
+        }
+
+        // ===========================================================
+        // BARCODE HANDLER
+        // ===========================================================
 
         private void OnBarcodeDetected(string code)
         {
-            
             if (InvokeRequired)
             {
                 BeginInvoke(new Action(() => OnBarcodeDetected(code)));
                 return;
             }
 
-            
+            // debounce – odfiltruje duplicitné frame scany
+            var now = DateTime.Now;
+            if (code == lastScannedCode && (now - lastScanAt).TotalMilliseconds < 700)
+                return;
+
+            lastScannedCode = code;
+            lastScanAt = now;
+
+            // reaguj len keď sme na HOME
             if (currentPanel != null)
                 return;
 
@@ -289,7 +510,14 @@ namespace epos
                 {
                     conn.Open();
 
-                    string sql = "SELECT name, price FROM products WHERE barcode = @code LIMIT 1";
+                    string sql = @"
+                            SELECT p.name, p.price, p.image, COALESCE(v.rate, 20.00) AS vat_rate
+                            FROM products p
+                            LEFT JOIN vat_categories v ON v.id = p.vat_category_id
+                            WHERE p.barcode = @code
+                            LIMIT 1";
+
+
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@code", code);
@@ -300,19 +528,23 @@ namespace epos
                             {
                                 string name = rd.GetString("name");
                                 decimal price = rd.GetDecimal("price");
+                                decimal vatRate = rd.GetDecimal(rd.GetOrdinal("vat_rate"));
+                                string img = rd["image"] as string;
 
                                 lblNameValue.Text = name;
                                 lblPriceValue.Text = price.ToString("0.00") + " €";
-                                lblCountValue.Text = "1";
 
-                                
-                                AddItemToReceipt(code, name, price);
+                                AddItemToReceipt(code, name, price, 1, vatRate);
+                                lblCountValue.Text = GetQuantityForBarcode(code).ToString();
+
+                                SetProductImage(img);
                             }
                             else
                             {
                                 lblNameValue.Text = "Neznámy produkt";
                                 lblPriceValue.Text = "-";
                                 lblCountValue.Text = "-";
+                                SetProductImage(null);
                             }
                         }
                     }
@@ -326,17 +558,20 @@ namespace epos
         }
 
         // ===========================================================
-        // BLOČEK – manipulácia s položkami
+        // RECEIPT
         // ===========================================================
 
-        
         private void AddItemToReceipt(string barcode, string name, decimal price)
         {
-            AddItemToReceipt(barcode, name, price, 1);
+            AddItemToReceipt(barcode, name, price, 1, 20m); // fallback 20%
         }
 
-        
         private void AddItemToReceipt(string barcode, string name, decimal price, int quantity)
+        {
+            AddItemToReceipt(barcode, name, price, quantity, 20m); // fallback 20%
+        }
+
+        private void AddItemToReceipt(string barcode, string name, decimal price, int quantity, decimal vatRate)
         {
             if (quantity <= 0) quantity = 1;
 
@@ -344,6 +579,11 @@ namespace epos
             if (existing != null)
             {
                 existing.Quantity += quantity;
+
+                // sync (ak sa zmení cena / názov / sadzba v DB)
+                existing.UnitPrice = price;
+                existing.Name = name;
+                existing.VatRate = vatRate;
             }
             else
             {
@@ -351,8 +591,9 @@ namespace epos
                 {
                     Barcode = barcode,
                     Name = name,
-                    UnitPrice = price,
-                    Quantity = quantity
+                    UnitPrice = price,     // bez DPH
+                    Quantity = quantity,
+                    VatRate = vatRate
                 });
             }
 
@@ -360,10 +601,58 @@ namespace epos
         }
 
 
+
+        private int GetQuantityForBarcode(string barcode)
+        {
+            var it = receiptItems.FirstOrDefault(x => x.Barcode == barcode);
+            return it?.Quantity ?? 0;
+        }
+
+        private void SetProductImage(string imageValue)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(imageValue))
+                {
+                    productPicture.Image = null;
+                    return;
+                }
+
+                productPicture.Image = null;
+                productPicture.LoadAsync(imageValue);
+            }
+            catch
+            {
+                productPicture.Image = null;
+            }
+        }
+        private static decimal Round2(decimal v) => Math.Round(v, 2, MidpointRounding.AwayFromZero);
+
+        private class VatTotals
+        {
+            public decimal Net;
+            public decimal Vat;
+            public decimal Gross;
+        }
+
+        private static VatTotals CalcLineNet(decimal netUnitPrice, int qty, decimal vatRate)
+        {
+            var net = netUnitPrice * qty;
+            var vat = net * (vatRate / 100m);
+            var gross = net + vat;
+
+            return new VatTotals
+            {
+                Net = Round2(net),
+                Vat = Round2(vat),
+                Gross = Round2(gross)
+            };
+        }
+
+
         private void UpdateReceiptText()
         {
-            if (receiptTextBox == null)
-                return;
+            if (receiptTextBox == null) return;
 
             var sb = new StringBuilder();
 
@@ -375,30 +664,53 @@ namespace epos
             }
 
             sb.AppendLine("Položky");
-            sb.AppendLine(new string('-', 40));
+            sb.AppendLine(new string('-', 42));
 
-            decimal subtotal = 0m;
+            decimal totalNet = 0m;
 
             foreach (var item in receiptItems)
             {
-                decimal lineTotal = item.UnitPrice * item.Quantity;
-                subtotal += lineTotal;
+                decimal lineNet = item.UnitPrice * item.Quantity; // bez DPH
+                totalNet += lineNet;
 
                 sb.AppendLine(item.Name);
-                sb.AppendLine(
-                    $"  {item.Quantity} x {item.UnitPrice:0.00} €   = {lineTotal:0.00} €"
-                );
+                sb.AppendLine($"  {item.Quantity} x {item.UnitPrice:0.00} € = {lineNet:0.00} €  (DPH {item.VatRate:0}%)");
                 sb.AppendLine();
             }
 
-            sb.AppendLine(new string('-', 40));
-            sb.AppendLine($"Spolu: {subtotal:0.00} €");
+            // rozpis podľa sadzieb
+            var groups = receiptItems
+                .GroupBy(x => x.VatRate)
+                .Select(g => new
+                {
+                    VatRate = g.Key,
+                    Net = g.Sum(i => i.UnitPrice * i.Quantity)
+                })
+                .OrderBy(g => g.VatRate)
+                .ToList();
+
+            sb.AppendLine(new string('-', 42));
+            sb.AppendLine($"Základ spolu: {totalNet:0.00} €");
+
+            decimal totalVat = 0m;
+            foreach (var g in groups)
+            {
+                decimal vat = Math.Round(g.Net * (g.VatRate / 100m), 2, MidpointRounding.AwayFromZero);
+                totalVat += vat;
+
+                sb.AppendLine($"DPH {g.VatRate:0}%:  základ {g.Net:0.00} €  DPH {vat:0.00} €");
+            }
+
+            sb.AppendLine(new string('-', 42));
+            sb.AppendLine($"Spolu na úhradu: {(totalNet + totalVat):0.00} €");
 
             receiptTextBox.Text = sb.ToString();
         }
 
+
+
         // ===========================================================
-        // TLAČ BLOČKA PDF
+        // PDF PRINT (tvoja logika zostáva)
         // ===========================================================
 
         private void BtnPrintReceipt_Click(object sender, EventArgs e)
@@ -425,135 +737,97 @@ namespace epos
                     var doc = new PdfDocument();
                     doc.Info.Title = "EPOS Bloček";
 
-                    PdfPage page = doc.AddPage();
+                    var page = doc.AddPage();
                     page.Size = PdfSharp.PageSize.A5;
-                    page.Orientation = PdfSharp.PageOrientation.Portrait;
 
-                    XGraphics gfx = XGraphics.FromPdfPage(page);
+                    var gfx = XGraphics.FromPdfPage(page);
 
-                    var fontHeader = new XFont("Arial", 20, XFontStyleEx.Bold);
-                    var fontRegular = new XFont("Arial", 9, XFontStyleEx.Regular);
-                    var fontMono = new XFont("Courier New", 9, XFontStyleEx.Regular); // monospace
+                    var fontHeader = new XFont("Arial", 18);
+                    var fontMono = new XFont("Courier New", 9);
 
+                    double pw = page.Width;
+                    double y = 25;
 
-                    double w = page.Width;
-                    double y = 30;
-
-                    var center = XStringFormats.Center;
                     var right = XStringFormats.TopRight;
+                    var center = XStringFormats.Center;
 
-                    // HEADER
-                    gfx.DrawString("EPOS", fontHeader, XBrushes.Black,
-                        new XRect(0, y, w, 30), center);
+                    decimal totalNet = 0m;
+                    decimal totalVat = 0m;
+                    decimal totalGross = 0m;
+
+                    // ===== HEADER =====
+                    // ===== HEADER =====
+                    gfx.DrawString("EPOS", new XFont("Arial", 20), XBrushes.Black,
+                        new XRect(0, y, pw, 30), center);
                     y += 40;
 
-                    gfx.DrawString("EPOS", fontRegular, XBrushes.Black,
-                        new XRect(0, y, w, 12), center);
-                    y += 12;
-                    gfx.DrawString("Hálova 16, 851 01 Bratislava", fontRegular, XBrushes.Black,
-                        new XRect(0, y, w, 12), center);
-                    y += 12;
-                    gfx.DrawString("IČO: 12345678", fontRegular, XBrushes.Black,
-                        new XRect(0, y, w, 12), center);
-                    y += 12;
-                    gfx.DrawString("DIČ: 1234567890", fontRegular, XBrushes.Black,
-                        new XRect(0, y, w, 12), center);
+                    gfx.DrawString("EPOS", fontMono, XBrushes.Black, new XRect(0, y, pw, 12), center); y += 12;
+                    gfx.DrawString("Hálova 16, 851 01 Bratislava", fontMono, XBrushes.Black, new XRect(0, y, pw, 12), center); y += 12;
+                    gfx.DrawString("IČO: 12345678", fontMono, XBrushes.Black, new XRect(0, y, pw, 12), center); y += 12;
+                    gfx.DrawString("DIČ: 1234567890", fontMono, XBrushes.Black, new XRect(0, y, pw, 12), center); y += 12;
+                    gfx.DrawString("IČ DPH: SK1234567890", fontMono, XBrushes.Black, new XRect(0, y, pw, 12), center); y += 18;
+
+                    gfx.DrawLine(XPens.Black, 20, y, pw - 20, y);
                     y += 14;
 
-                    gfx.DrawLine(XPens.Black, 20, y, w - 20, y);
-                    y += 10;
 
-                    // INFO O DOKLADE
-                    gfx.DrawString($"Pokladňa: 69", fontMono, XBrushes.Black,
-                        new XPoint(20, y));
-                    gfx.DrawString($"Doklad: {now:yyyy-000000}", fontMono, XBrushes.Black,
-                        new XPoint(w - 20, y), right);
+                    // ===== INFO RIADOKY =====
+                    string docNumber = now.ToString("yyyyMMddHHmmss");
+
+                    gfx.DrawString($"Pokladňa: 69", fontMono, XBrushes.Black, new XPoint(20, y));
+                    gfx.DrawString($"Doklad: {docNumber}", fontMono, XBrushes.Black, new XPoint(pw - 20, y), right);
                     y += 14;
 
-                    gfx.DrawString($"Dátum: {now:dd.MM.yyyy}", fontMono, XBrushes.Black,
-                        new XPoint(20, y));
-                    gfx.DrawString($"Čas: {now:HH:mm:ss}", fontMono, XBrushes.Black,
-                        new XPoint(w - 20, y), right);
+                    gfx.DrawString($"Dátum: {now:dd.MM.yyyy}", fontMono, XBrushes.Black, new XPoint(20, y));
+                    gfx.DrawString($"Čas: {now:HH:mm:ss}", fontMono, XBrushes.Black, new XPoint(pw - 20, y), right);
                     y += 14;
 
-                    gfx.DrawString("Pokladník:", fontMono, XBrushes.Black,
-                        new XPoint(20, y));
-                    // zatiaľ nevieme meno → prázdne
-                    y += 16;
+                    // 👇 TU JE ZMENA — cashier code namiesto mena
+                    gfx.DrawString($"Pokladník: {cashierCode}", fontMono, XBrushes.Black, new XPoint(20, y));
+                    y += 18;
 
-                    gfx.DrawLine(XPens.Black, 20, y, w - 20, y);
-                    y += 10;
+                    gfx.DrawLine(XPens.Black, 20, y, pw - 20, y);
+                    y += 14;
 
-                    // POLOŽKY
-                    decimal subtotal = 0m;
 
+                    // ===== ITEMS =====
                     foreach (var item in receiptItems)
                     {
-                        decimal lineTotal = item.UnitPrice * item.Quantity;
-                        subtotal += lineTotal;
+                        var line = CalcLineNet(item.UnitPrice, item.Quantity, item.VatRate);
+
+                        totalNet += line.Net;
+                        totalVat += line.Vat;
+                        totalGross += line.Gross;
 
                         gfx.DrawString(item.Name, fontMono, XBrushes.Black,
                             new XPoint(20, y));
-                        gfx.DrawString(lineTotal.ToString("0.00") + " €", fontMono, XBrushes.Black,
-                            new XPoint(w - 20, y), right);
-                        y += 14;
 
-                        string qtyLine = $"{item.Quantity} x {item.UnitPrice:0.00} €";
-                        gfx.DrawString(qtyLine, fontMono, XBrushes.Black,
+                        gfx.DrawString(line.Gross.ToString("0.00") + " €", fontMono, XBrushes.Black,
+                            new XPoint(pw - 20, y), right);
+
+                        y += 12;
+
+                        gfx.DrawString($"{item.Quantity} x {item.UnitPrice:0.00} €  (DPH {item.VatRate}%)",
+                            fontMono, XBrushes.Black,
                             new XPoint(30, y));
-                        y += 14;
 
-                        y += 4;
+                        y += 18;
                     }
 
-                    gfx.DrawLine(XPens.Black, 20, y, w - 20, y);
-                    y += 10;
-
-                    // JEDNODUCHÁ DPH 20 %
-                    decimal taxBase = subtotal / 1.20m;
-                    decimal tax = subtotal - taxBase;
-
-                    gfx.DrawString("Medzisúčet:", fontMono, XBrushes.Black,
-                        new XPoint(20, y));
-                    gfx.DrawString(subtotal.ToString("0.00") + " €", fontMono, XBrushes.Black,
-                        new XPoint(w - 20, y), right);
+                    gfx.DrawLine(XPens.Black, 20, y, pw - 20, y);
                     y += 14;
 
-                    gfx.DrawString("Základ DPH:", fontMono, XBrushes.Black,
-                        new XPoint(20, y));
-                    gfx.DrawString(taxBase.ToString("0.00") + " €", fontMono, XBrushes.Black,
-                        new XPoint(w - 20, y), right);
-                    y += 14;
+                    // ===== SUMÁR =====
+                    gfx.DrawString("Medzisúčet (netto):", fontMono, XBrushes.Black, new XPoint(20, y));
+                    gfx.DrawString(totalNet.ToString("0.00") + " €", fontMono, XBrushes.Black, new XPoint(pw - 20, y), right);
+                    y += 12;
 
-                    gfx.DrawString("DPH 20 %:", fontMono, XBrushes.Black,
-                        new XPoint(20, y));
-                    gfx.DrawString(tax.ToString("0.00") + " €", fontMono, XBrushes.Black,
-                        new XPoint(w - 20, y), right);
-                    y += 16;
+                    gfx.DrawString("DPH spolu:", fontMono, XBrushes.Black, new XPoint(20, y));
+                    gfx.DrawString(totalVat.ToString("0.00") + " €", fontMono, XBrushes.Black, new XPoint(pw - 20, y), right);
+                    y += 12;
 
-                    gfx.DrawLine(XPens.Black, 20, y, w - 20, y);
-                    y += 10;
-
-                    gfx.DrawString("CELKOM NA ÚHRADU:", fontMono, XBrushes.Black,
-                        new XPoint(20, y));
-                    gfx.DrawString(subtotal.ToString("0.00") + " €", fontMono, XBrushes.Black,
-                        new XPoint(w - 20, y), right);
-                    y += 16;
-
-                    gfx.DrawString("Zaplatené kartou:", fontMono, XBrushes.Black,
-                        new XPoint(20, y));
-                    gfx.DrawString(subtotal.ToString("0.00") + " €", fontMono, XBrushes.Black,
-                        new XPoint(w - 20, y), right);
-                    y += 20;
-
-                    gfx.DrawLine(XPens.Black, 20, y, w - 20, y);
-                    y += 20;
-
-                    gfx.DrawString("Ďakujeme za nákup!", fontMono, XBrushes.Black,
-                        new XRect(0, y, w, 12), center);
-                    y += 14;
-                    gfx.DrawString("Reklamácie len s týmto dokladom.", fontMono, XBrushes.Black,
-                        new XRect(0, y, w, 12), center);
+                    gfx.DrawString("CELKOM NA ÚHRADU:", fontMono, XBrushes.Black, new XPoint(20, y));
+                    gfx.DrawString(totalGross.ToString("0.00") + " €", fontMono, XBrushes.Black, new XPoint(pw - 20, y), right);
 
                     doc.Save(sfd.FileName);
 
@@ -567,6 +841,7 @@ namespace epos
                 }
             }
         }
+
 
         // ===========================================================
         // PANEL SWITCHING
@@ -589,7 +864,6 @@ namespace epos
             currentPanel = panel;
             panel.Visible = true;
             panel.BringToFront();
-
             LayoutUi();
         }
 
@@ -605,15 +879,14 @@ namespace epos
             int h = ClientSize.Height;
             int topPadding = 35;
 
-            // === NAVBAR ===
+            // NAVBAR
             btnHome.Location = new Point(40, topPadding);
             btnSettings.Location = new Point(150, topPadding);
             btnAddItem.Location = new Point(260, topPadding);
-            btnProducts.Location = new Point(380, topPadding); // Products na mieste RemoveItem
-
+            btnProducts.Location = new Point(380, topPadding);
             btnLogout.Location = new Point(w - btnLogout.Width - 40, topPadding);
 
-            // UPDATE underline position after resize
+            // underline
             if (activeButton != null)
             {
                 underline.Width = (int)(activeButton.Width * 0.45);
@@ -621,78 +894,51 @@ namespace epos
                 underline.Top = activeButton.Bottom + 2;
             }
 
-            // === HOME PANEL ===
+            // HOME vs PANELS
             if (currentPanel == null)
             {
-                lblTitle.Visible = true;
-                lblBarcode.Visible = true;
-                lblBarcodeValue.Visible = true;
-                lblName.Visible = true;
-                lblNameValue.Visible = true;
-                lblCount.Visible = true;
-                lblCountValue.Visible = true;
-                lblPrice.Visible = true;
-                lblPriceValue.Visible = true;
-                btnAddManual.Visible = true;
-                receiptPreview.Visible = true;
-                receiptTextBox.Visible = true;
-                btnPrintReceipt.Visible = true;
+                // HOME grid viditeľný
+                homeRoot.Visible = true;
 
-                int baseY = topPadding + 180;
+                // schovať ostatné panely
+                settingsPanel.Visible = false;
+                addItemPanel.Visible = false;
+                productsPanel.Visible = false;
 
-                lblTitle.Location = new Point(70, topPadding + 100);
-                lblBarcode.Location = new Point(70, baseY);
-                lblBarcodeValue.Location = new Point(180, baseY);
-                lblName.Location = new Point(70, baseY + 40);
-                lblNameValue.Location = new Point(180, baseY + 40);
-                lblCount.Location = new Point(70, baseY + 80);
-                lblCountValue.Location = new Point(180, baseY + 80);
-                lblPrice.Location = new Point(70, baseY + 120);
-                lblPriceValue.Location = new Point(180, baseY + 120);
-                btnAddManual.Location = new Point(70, baseY + 180);
+                // HOME grid rozmery (pod navbarom)
+                int marginX = 50;
+                int top = topPadding + 85;
+                int marginBottom = 45;
 
-                // tlačidlo Tlačiť
-                btnPrintReceipt.Location = new Point(70, baseY + 230);
-
-                int receiptWidth = 340;
-                int rightMargin = 80;
-
-                receiptPreview.Size = new Size(receiptWidth, 460);
-                receiptPreview.Location = new Point(
-                    w - receiptWidth - rightMargin,
-                    baseY - 30
+                homeRoot.Location = new Point(marginX, top);
+                homeRoot.Size = new Size(
+                    Math.Max(600, w - (marginX * 2)),
+                    Math.Max(420, h - top - marginBottom)
                 );
 
+                // refresh text
                 UpdateReceiptText();
             }
             else
             {
-                // schovať HOME prvky
-                lblTitle.Visible = false;
-                lblBarcode.Visible = false;
-                lblBarcodeValue.Visible = false;
-                lblName.Visible = false;
-                lblNameValue.Visible = false;
-                lblCount.Visible = false;
-                lblCountValue.Visible = false;
-                lblPrice.Visible = false;
-                lblPriceValue.Visible = false;
-                btnAddManual.Visible = false;
-                receiptPreview.Visible = false;
-                receiptTextBox.Visible = false;
-                btnPrintReceipt.Visible = false;
+                // HOME grid schovať
+                homeRoot.Visible = false;
 
                 int panelTop = topPadding + 60;
-                int panelHeight = h - (topPadding + 60);
+                int panelHeight = h - panelTop;
 
-                settingsPanel.Location = new Point(0, panelTop);
-                settingsPanel.Size = new Size(w, panelHeight);
+                currentPanel.Location = new Point(0, panelTop);
+                currentPanel.Size = new Size(w, panelHeight);
+                currentPanel.Visible = true;
+                currentPanel.BringToFront();
 
-                addItemPanel.Location = new Point(0, panelTop);
-                addItemPanel.Size = new Size(w, panelHeight);
-
-                productsPanel.Location = new Point(0, panelTop);
-                productsPanel.Size = new Size(w, panelHeight);
+                // navbar nad panelom
+                btnHome.BringToFront();
+                btnSettings.BringToFront();
+                btnAddItem.BringToFront();
+                btnProducts.BringToFront();
+                btnLogout.BringToFront();
+                underline.BringToFront();
             }
         }
     }
