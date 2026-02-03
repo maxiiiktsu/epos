@@ -180,7 +180,7 @@ namespace epos
             b.Location = new Point(x, 35);
             b.Cursor = Cursors.Hand;
 
-            // absolutely ensure no shadow or effects
+            
             b.ShadowDecoration.Enabled = false;
 
             return b;

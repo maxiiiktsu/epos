@@ -105,3 +105,4 @@ C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\PdfSh
 C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\System.Diagnostics.DiagnosticSource.xml
 C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\System.Security.Cryptography.Pkcs.xml
 C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\bin\Debug\System.ValueTuple.xml
+C:\Users\mfruh\Documents\programovaine\git_repo_csharp\epos\epos\obj\Debug\epos.SettingsPanel.resources

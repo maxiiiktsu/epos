@@ -8,14 +8,16 @@ namespace epos
 {
     public class ManualAddForm : Form
     {
-        
         public class ManualProductResult
         {
             public string Barcode { get; set; }
             public string Name { get; set; }
-            public decimal UnitPrice { get; set; }
+            public decimal UnitPrice { get; set; }  // NETTO
             public int Quantity { get; set; }
             public string ImageUrl { get; set; }
+
+            public string VatKey { get; set; }      
+            public decimal VatRate { get; set; }    
         }
 
         public ManualProductResult SelectedProduct { get; private set; }
@@ -24,6 +26,7 @@ namespace epos
         private Guna2TextBox txtName;
         private Guna2TextBox txtQuantity;
         private Label lblPriceValue;
+        private Label lblVatValue;
         private PictureBox picPreview;
         private Guna2Button btnAdd;
         private ListBox lstSuggestions;
@@ -37,10 +40,10 @@ namespace epos
             public decimal Price { get; set; }
             public string ImageUrl { get; set; }
 
-            public override string ToString()
-            {
-                return $"{Barcode} – {Name}";
-            }
+            public string VatKey { get; set; }
+            public decimal VatRate { get; set; }
+
+            public override string ToString() => $"{Barcode} – {Name}";
         }
 
         public ManualAddForm()
@@ -56,7 +59,7 @@ namespace epos
             MaximizeBox = false;
             MinimizeBox = false;
             BackColor = Color.White;
-            ClientSize = new Size(620, 360);
+            ClientSize = new Size(620, 380);
 
             var lblTitle = new Label
             {
@@ -120,11 +123,11 @@ namespace epos
                 Size = new Size(inputWidth, 110),
                 Visible = false
             };
-            lstSuggestions.Click += LstSuggestions_Click;
+            lstSuggestions.Click += (_, __) => ApplySelectedSuggestion();
             lstSuggestions.KeyDown += LstSuggestions_KeyDown;
             Controls.Add(lstSuggestions);
 
-            // Počet
+            
             y = 210;
             Controls.Add(new Label
             {
@@ -139,7 +142,8 @@ namespace epos
                 PlaceholderText = "Zadajte počet",
                 Location = new Point(leftX, y + 18),
                 Size = new Size(inputWidth, 32),
-                BorderRadius = 8
+                BorderRadius = 8,
+                Text = "1"
             };
             Controls.Add(txtQuantity);
 
@@ -147,7 +151,7 @@ namespace epos
             y = 260;
             Controls.Add(new Label
             {
-                Text = "Cena",
+                Text = "Cena (netto)",
                 Font = new Font("Segoe UI", 9, FontStyle.Bold),
                 AutoSize = true,
                 Location = new Point(leftX, y)
@@ -158,11 +162,30 @@ namespace epos
                 Text = "-",
                 Font = new Font("Segoe UI", 9),
                 AutoSize = true,
-                Location = new Point(leftX + 50, y)
+                Location = new Point(leftX + 90, y)
             };
             Controls.Add(lblPriceValue);
 
-            
+            // DPH
+            y = 285;
+            Controls.Add(new Label
+            {
+                Text = "DPH",
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                AutoSize = true,
+                Location = new Point(leftX, y)
+            });
+
+            lblVatValue = new Label
+            {
+                Text = "-",
+                Font = new Font("Segoe UI", 9),
+                AutoSize = true,
+                Location = new Point(leftX + 40, y)
+            };
+            Controls.Add(lblVatValue);
+
+            // Preview obrázok
             picPreview = new PictureBox
             {
                 BackColor = Color.FromArgb(230, 230, 230),
@@ -171,19 +194,6 @@ namespace epos
                 SizeMode = PictureBoxSizeMode.Zoom
             };
             Controls.Add(picPreview);
-
-            var lblImg = new Label
-            {
-                Text = "obrázok",
-                AutoSize = true,
-                Font = new Font("Segoe UI", 9),
-                ForeColor = Color.Gray
-            };
-            lblImg.Location = new Point(
-                picPreview.Left + (picPreview.Width - lblImg.Width) / 2,
-                picPreview.Top + (picPreview.Height - lblImg.Height) / 2
-            );
-            Controls.Add(lblImg);
 
             // Button Pridať
             btnAdd = new Guna2Button
@@ -225,12 +235,16 @@ namespace epos
                 {
                     conn.Open();
 
-                    string sql =
-                        @"SELECT barcode, name, price, image
-                          FROM products
-                          WHERE barcode LIKE @t OR name LIKE @t
-                          ORDER BY name
-                          LIMIT 10";
+                    
+                    string sql = @"
+                        SELECT 
+                            p.barcode, p.name, p.price, p.image, p.vat_key,
+                            COALESCE(s.vat_rate, 20.00) AS vat_rate
+                        FROM products p
+                        LEFT JOIN vat_settings s ON s.vat_key = p.vat_key
+                        WHERE p.barcode LIKE @t OR p.name LIKE @t
+                        ORDER BY p.name
+                        LIMIT 10;";
 
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
@@ -247,7 +261,9 @@ namespace epos
                                     Barcode = rd.GetString("barcode"),
                                     Name = rd.GetString("name"),
                                     Price = rd.GetDecimal("price"),
-                                    ImageUrl = rd["image"] as string
+                                    ImageUrl = rd["image"] as string,
+                                    VatKey = rd["vat_key"] as string,
+                                    VatRate = rd.GetDecimal(rd.GetOrdinal("vat_rate"))
                                 });
                             }
                         }
@@ -258,7 +274,6 @@ namespace epos
             }
             catch (Exception ex)
             {
-                
                 MessageBox.Show("Chyba pri vyhľadávaní:\n" + ex.Message,
                     "DB chyba", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 lstSuggestions.Visible = false;
@@ -274,11 +289,6 @@ namespace epos
                 lstSuggestions.SelectedIndex = 0;
                 e.Handled = true;
             }
-        }
-
-        private void LstSuggestions_Click(object sender, EventArgs e)
-        {
-            ApplySelectedSuggestion();
         }
 
         private void LstSuggestions_KeyDown(object sender, KeyEventArgs e)
@@ -297,27 +307,28 @@ namespace epos
 
         private void ApplySelectedSuggestion()
         {
-            if (lstSuggestions.SelectedItem is Suggestion s)
+            if (!(lstSuggestions.SelectedItem is Suggestion s))
+                return;
+
+            _updatingFields = true;
+
+            txtBarcode.Text = s.Barcode;
+            txtName.Text = s.Name;
+            lblPriceValue.Text = s.Price.ToString("0.00") + " €";
+            lblVatValue.Text = $"{s.VatRate:0.##}% ({(string.IsNullOrWhiteSpace(s.VatKey) ? "?" : s.VatKey)})";
+
+            if (!string.IsNullOrWhiteSpace(s.ImageUrl))
             {
-                _updatingFields = true;
-
-                txtBarcode.Text = s.Barcode;
-                txtName.Text = s.Name;
-                lblPriceValue.Text = s.Price.ToString("0.00") + " €";
-
-                if (!string.IsNullOrWhiteSpace(s.ImageUrl))
-                {
-                    try { picPreview.Load(s.ImageUrl); }
-                    catch { picPreview.Image = null; }
-                }
-                else
-                {
-                    picPreview.Image = null;
-                }
-
-                _updatingFields = false;
-                lstSuggestions.Visible = false;
+                try { picPreview.Load(s.ImageUrl); }
+                catch { picPreview.Image = null; }
             }
+            else
+            {
+                picPreview.Image = null;
+            }
+
+            _updatingFields = false;
+            lstSuggestions.Visible = false;
         }
 
         // ======================= PRIDAŤ PRODUKT =======================
@@ -350,12 +361,17 @@ namespace epos
                 {
                     conn.Open();
 
-                    string sql =
-                        @"SELECT barcode, name, price, image 
-                          FROM products
-                          WHERE (@bc <> '' AND barcode = @bc)
-                             OR (@bc = '' AND @nm <> '' AND name LIKE @nm)
-                          LIMIT 1";
+                    
+                    string sql = @"
+                        SELECT 
+                            p.barcode, p.name, p.price, p.image, p.vat_key,
+                            COALESCE(s.vat_rate, 20.00) AS vat_rate
+                        FROM products p
+                        LEFT JOIN vat_settings s ON s.vat_key = p.vat_key
+                        WHERE (@bc <> '' AND p.barcode = @bc)
+                           OR (@bc = '' AND @nm <> '' AND p.name LIKE @nm)
+                        ORDER BY p.name
+                        LIMIT 1;";
 
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
@@ -377,7 +393,11 @@ namespace epos
                             decimal price = rd.GetDecimal("price");
                             string imgUrl = rd["image"] as string;
 
+                            string vatKey = rd["vat_key"] as string;
+                            decimal vatRate = rd.GetDecimal(rd.GetOrdinal("vat_rate"));
+
                             lblPriceValue.Text = price.ToString("0.00") + " €";
+                            lblVatValue.Text = $"{vatRate:0.##}% ({(string.IsNullOrWhiteSpace(vatKey) ? "?" : vatKey)})";
 
                             if (!string.IsNullOrWhiteSpace(imgUrl))
                             {
@@ -395,7 +415,9 @@ namespace epos
                                 Name = dbName,
                                 UnitPrice = price,
                                 Quantity = qty,
-                                ImageUrl = imgUrl
+                                ImageUrl = imgUrl,
+                                VatKey = vatKey,
+                                VatRate = vatRate
                             };
                         }
                     }

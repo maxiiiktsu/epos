@@ -64,7 +64,7 @@ namespace epos
             lblError.ForeColor = errorColor;
             lblError.Visible = true;
 
-            // červený rámček okolo textboxu (focus/hover)
+            
             txtCode.BorderColor = errorColor;
             txtCode.FocusedState.BorderColor = errorColor;
             txtCode.HoverState.BorderColor = errorColor;
