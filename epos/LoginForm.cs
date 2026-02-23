@@ -55,7 +55,7 @@ namespace epos
             cardPanel.Top = (this.ClientSize.Height - cardPanel.Height) / 2;
         }
 
-        // ====== UI helpery pre error stav ======
+        
 
         private void ShowError(string message)
         {
@@ -80,7 +80,7 @@ namespace epos
             txtCode.HoverState.BorderColor = defaultBorderColor;
         }
 
-        // ====== LOGIN CLICK ======
+        
         private void BtnLogin_Click(object sender, EventArgs e)
         {
             ClearError();
@@ -110,7 +110,6 @@ namespace epos
 
                         if (result == null || result == DBNull.Value)
                         {
-                            
                             ShowError("Zadali ste nesprávny kód");
                             txtCode.SelectAll();
                             txtCode.Focus();
@@ -121,9 +120,16 @@ namespace epos
 
                 
                 var main = new Form1(code);
-                main.FormClosed += (_, __) => Application.Exit();
 
-                Hide();
+                
+                main.FormClosed += (_, __) =>
+                {
+                    this.Show();
+                    txtCode.Text = "";
+                    txtCode.Focus();
+                };
+
+                this.Hide();
                 main.Show();
             }
             catch (Exception ex)

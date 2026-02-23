@@ -38,8 +38,7 @@ namespace epos
             public string Name;
             public decimal UnitPrice;
             public int Quantity;
-            public decimal VatRate; 
-
+            public decimal VatRate;
         }
 
         private readonly System.Collections.Generic.List<ReceiptItem> receiptItems =
@@ -48,7 +47,6 @@ namespace epos
         // ====== IMAGE PREVIEW ======
         private PictureBox productPicture;
 
-        
         private string lastScannedCode = null;
         private DateTime lastScanAt = DateTime.MinValue;
 
@@ -61,10 +59,14 @@ namespace epos
         public Form1(string cashierCode)
         {
             this.cashierCode = cashierCode;
+
             WindowsFontResolver.Apply();
             InitializeComponent();
 
-            
+            // ===== LOGOUT (fix) =====
+            btnLogout.Click -= BtnLogout_Click;
+            btnLogout.Click += BtnLogout_Click;
+
             btnRemoveItem.Visible = false;
 
             // ===== receipt textbox (do receiptPreview) =====
@@ -101,12 +103,11 @@ namespace epos
             // ===== product image preview =====
             productPicture = new PictureBox
             {
-                BackColor = Color.FromArgb(25, 25, 25),   
+                BackColor = Color.FromArgb(25, 25, 25),
                 SizeMode = PictureBoxSizeMode.Zoom,
                 Dock = DockStyle.Fill,
-                Margin = new Padding(12)                 
+                Margin = new Padding(12)
             };
-
 
             // ===== PANELY =====
             settingsPanel = new SettingsPanel { Visible = false };
@@ -139,7 +140,6 @@ namespace epos
             HookNavbarEvents();
             SetActiveButton(btnHome);
 
-            
             BuildHomeGrid();
 
             // manuálne pridanie
@@ -162,24 +162,41 @@ namespace epos
                 MessageBox.Show("Nepodarilo sa spustiť kameru: " + ex.Message,
                     "Kamera", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-
-            this.cashierCode = cashierCode;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            scanner?.Dispose();
+            try
+            {
+                scanner?.Dispose();
+                scanner = null;
+            }
+            catch { }
+
             base.OnFormClosing(e);
+        }
+
+        // ===== LOGOUT HANDLER =====
+        private void BtnLogout_Click(object sender, EventArgs e)
+        {
+            
+            try
+            {
+                scanner?.Dispose();
+                scanner = null;
+            }
+            catch { }
+
+            Close(); 
         }
 
         // ===========================================================
         // HOME GRID BUILD
         // ===========================================================
 
-        
         private class BorderPanel : Panel
         {
-            public Color BorderColor { get; set; } = Color.FromArgb(55, 255, 255, 255); // jemná biela
+            public Color BorderColor { get; set; } = Color.FromArgb(55, 255, 255, 255);
             public int BorderThickness { get; set; } = 1;
 
             public BorderPanel()
@@ -206,7 +223,6 @@ namespace epos
         {
             if (homeRoot != null) return;
 
-            
             homeRoot = new TableLayoutPanel
             {
                 ColumnCount = 3,
@@ -215,21 +231,17 @@ namespace epos
                 BackColor = Color.Transparent
             };
 
-            
-            homeRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34f)); 
-            homeRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 28f)); 
-            homeRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 38f)); 
-
+            homeRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34f));
+            homeRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 28f));
+            homeRoot.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 38f));
             homeRoot.RowStyles.Add(new RowStyle(SizeType.Percent, 100f));
 
-            
             infoCell = new BorderPanel();
             imageCell = new BorderPanel
             {
-                BorderColor = Color.FromArgb(40, 255, 255, 255), 
-                BackColor = Color.FromArgb(18, 18, 18)           
+                BorderColor = Color.FromArgb(40, 255, 255, 255),
+                BackColor = Color.FromArgb(18, 18, 18)
             };
-
             receiptCell = new BorderPanel();
 
             homeRoot.Controls.Add(infoCell, 0, 0);
@@ -248,59 +260,47 @@ namespace epos
                 Dock = DockStyle.Fill,
                 BackColor = Color.Transparent
             };
-            infoTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 110)); 
-            infoTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));  
+            infoTable.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 110));
+            infoTable.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
-            // Title (span 2)
-            infoTable.RowStyles.Add(new RowStyle(SizeType.AutoSize)); 
-            infoTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 14)); 
-            infoTable.RowStyles.Add(new RowStyle(SizeType.AutoSize)); 
-            infoTable.RowStyles.Add(new RowStyle(SizeType.AutoSize)); 
-            infoTable.RowStyles.Add(new RowStyle(SizeType.AutoSize)); 
-            infoTable.RowStyles.Add(new RowStyle(SizeType.AutoSize)); 
-            infoTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100)); 
+            infoTable.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            infoTable.RowStyles.Add(new RowStyle(SizeType.Absolute, 14));
+            infoTable.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            infoTable.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            infoTable.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            infoTable.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+            infoTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
 
-            
             lblTitle.Dock = DockStyle.Top;
             lblTitle.Margin = new Padding(0, 0, 0, 0);
 
-            // Title do 0. riadku, span 2
             infoTable.Controls.Add(lblTitle, 0, 0);
             infoTable.SetColumnSpan(lblTitle, 2);
 
-            // barcode row
             lblBarcode.Dock = DockStyle.Top;
             lblBarcodeValue.Dock = DockStyle.Top;
             lblBarcodeValue.Margin = new Padding(0, 0, 0, 10);
-
             infoTable.Controls.Add(lblBarcode, 0, 2);
             infoTable.Controls.Add(lblBarcodeValue, 1, 2);
 
-            // name row
             lblName.Dock = DockStyle.Top;
             lblNameValue.Dock = DockStyle.Top;
             lblNameValue.Margin = new Padding(0, 0, 0, 10);
-
             infoTable.Controls.Add(lblName, 0, 3);
             infoTable.Controls.Add(lblNameValue, 1, 3);
 
-            // count row
             lblCount.Dock = DockStyle.Top;
             lblCountValue.Dock = DockStyle.Top;
             lblCountValue.Margin = new Padding(0, 0, 0, 10);
-
             infoTable.Controls.Add(lblCount, 0, 4);
             infoTable.Controls.Add(lblCountValue, 1, 4);
 
-            // price row
             lblPrice.Dock = DockStyle.Top;
             lblPriceValue.Dock = DockStyle.Top;
             lblPriceValue.Margin = new Padding(0, 0, 0, 10);
-
             infoTable.Controls.Add(lblPrice, 0, 5);
             infoTable.Controls.Add(lblPriceValue, 1, 5);
 
-            // Buttons 
             var buttonsFlow = new FlowLayoutPanel
             {
                 Dock = DockStyle.Bottom,
@@ -312,32 +312,26 @@ namespace epos
                 Margin = new Padding(0, 12, 0, 0)
             };
 
-            
             btnAddManual.Width = 220;
             btnAddManual.Height = 44;
 
             buttonsFlow.Controls.Add(btnAddManual);
             buttonsFlow.Controls.Add(btnPrintReceipt);
 
-            
             var infoHost = new Panel { Dock = DockStyle.Fill, BackColor = Color.Transparent };
             infoHost.Controls.Add(infoTable);
             infoHost.Controls.Add(buttonsFlow);
 
             infoCell.Controls.Add(infoHost);
 
-            // ---- IMAGE CELL ----
             imageCell.Controls.Add(productPicture);
 
-            // ---- RECEIPT CELL ----
             receiptPreview.Dock = DockStyle.Fill;
             receiptCell.Controls.Add(receiptPreview);
 
-            
             backgroundPanel.Controls.Add(homeRoot);
             homeRoot.BringToFront();
 
-            
             btnHome.BringToFront();
             btnSettings.BringToFront();
             btnAddItem.BringToFront();
@@ -490,7 +484,6 @@ namespace epos
                 return;
             }
 
-            
             var now = DateTime.Now;
             if (code == lastScannedCode && (now - lastScanAt).TotalMilliseconds < 700)
                 return;
@@ -498,7 +491,6 @@ namespace epos
             lastScannedCode = code;
             lastScanAt = now;
 
-            
             if (currentPanel != null)
                 return;
 
@@ -520,7 +512,6 @@ namespace epos
                                 LEFT JOIN vat_settings s ON s.vat_key = p.vat_key
                                 WHERE p.barcode = @code
                                 LIMIT 1";
-
 
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
@@ -567,12 +558,12 @@ namespace epos
 
         private void AddItemToReceipt(string barcode, string name, decimal price)
         {
-            AddItemToReceipt(barcode, name, price, 1, 20m); 
+            AddItemToReceipt(barcode, name, price, 1, 20m);
         }
 
         private void AddItemToReceipt(string barcode, string name, decimal price, int quantity)
         {
-            AddItemToReceipt(barcode, name, price, quantity, 20m); 
+            AddItemToReceipt(barcode, name, price, quantity, 20m);
         }
 
         private void AddItemToReceipt(string barcode, string name, decimal price, int quantity, decimal vatRate)
@@ -583,8 +574,6 @@ namespace epos
             if (existing != null)
             {
                 existing.Quantity += quantity;
-
-                
                 existing.UnitPrice = price;
                 existing.Name = name;
                 existing.VatRate = vatRate;
@@ -595,7 +584,7 @@ namespace epos
                 {
                     Barcode = barcode,
                     Name = name,
-                    UnitPrice = price,     // bez DPH
+                    UnitPrice = price, // bez DPH
                     Quantity = quantity,
                     VatRate = vatRate
                 });
@@ -603,8 +592,6 @@ namespace epos
 
             UpdateReceiptText();
         }
-
-
 
         private int GetQuantityForBarcode(string barcode)
         {
@@ -630,6 +617,7 @@ namespace epos
                 productPicture.Image = null;
             }
         }
+
         private static decimal Round2(decimal v) => Math.Round(v, 2, MidpointRounding.AwayFromZero);
 
         private class VatTotals
@@ -653,7 +641,6 @@ namespace epos
             };
         }
 
-
         private void UpdateReceiptText()
         {
             if (receiptTextBox == null) return;
@@ -674,7 +661,7 @@ namespace epos
 
             foreach (var item in receiptItems)
             {
-                decimal lineNet = item.UnitPrice * item.Quantity; 
+                decimal lineNet = item.UnitPrice * item.Quantity;
                 totalNet += lineNet;
 
                 sb.AppendLine(item.Name);
@@ -682,7 +669,6 @@ namespace epos
                 sb.AppendLine();
             }
 
-            
             var groups = receiptItems
                 .GroupBy(x => x.VatRate)
                 .Select(g => new
@@ -711,10 +697,8 @@ namespace epos
             receiptTextBox.Text = sb.ToString();
         }
 
-
-
         // ===========================================================
-        // PDF PRINT (tvoja logika zostáva)
+        // PDF PRINT
         // ===========================================================
 
         private void BtnPrintReceipt_Click(object sender, EventArgs e)
@@ -746,7 +730,6 @@ namespace epos
 
                     var gfx = XGraphics.FromPdfPage(page);
 
-                    var fontHeader = new XFont("Arial", 18);
                     var fontMono = new XFont("Courier New", 9);
 
                     double pw = page.Width;
@@ -759,7 +742,6 @@ namespace epos
                     decimal totalVat = 0m;
                     decimal totalGross = 0m;
 
-                    
                     // ===== HEADER =====
                     gfx.DrawString("EPOS", new XFont("Arial", 20), XBrushes.Black,
                         new XRect(0, y, pw, 30), center);
@@ -774,7 +756,6 @@ namespace epos
                     gfx.DrawLine(XPens.Black, 20, y, pw - 20, y);
                     y += 14;
 
-
                     // ===== INFO RIADKY =====
                     string docNumber = now.ToString("yyyyMMddHHmmss");
 
@@ -786,13 +767,11 @@ namespace epos
                     gfx.DrawString($"Čas: {now:HH:mm:ss}", fontMono, XBrushes.Black, new XPoint(pw - 20, y), right);
                     y += 14;
 
-                    
                     gfx.DrawString($"Pokladník: {cashierCode}", fontMono, XBrushes.Black, new XPoint(20, y));
                     y += 18;
 
                     gfx.DrawLine(XPens.Black, 20, y, pw - 20, y);
                     y += 14;
-
 
                     // ===== ITEMS =====
                     foreach (var item in receiptItems)
@@ -803,18 +782,12 @@ namespace epos
                         totalVat += line.Vat;
                         totalGross += line.Gross;
 
-                        gfx.DrawString(item.Name, fontMono, XBrushes.Black,
-                            new XPoint(20, y));
-
-                        gfx.DrawString(line.Gross.ToString("0.00") + " €", fontMono, XBrushes.Black,
-                            new XPoint(pw - 20, y), right);
-
+                        gfx.DrawString(item.Name, fontMono, XBrushes.Black, new XPoint(20, y));
+                        gfx.DrawString(line.Gross.ToString("0.00") + " €", fontMono, XBrushes.Black, new XPoint(pw - 20, y), right);
                         y += 12;
 
                         gfx.DrawString($"{item.Quantity} x {item.UnitPrice:0.00} €  (DPH {item.VatRate}%)",
-                            fontMono, XBrushes.Black,
-                            new XPoint(30, y));
-
+                            fontMono, XBrushes.Black, new XPoint(30, y));
                         y += 18;
                     }
 
@@ -845,7 +818,6 @@ namespace epos
                 }
             }
         }
-
 
         // ===========================================================
         // PANEL SWITCHING
@@ -901,15 +873,12 @@ namespace epos
             // HOME vs PANELS
             if (currentPanel == null)
             {
-                
                 homeRoot.Visible = true;
 
-                
                 settingsPanel.Visible = false;
                 addItemPanel.Visible = false;
                 productsPanel.Visible = false;
 
-                // HOME grid rozmery 
                 int marginX = 50;
                 int top = topPadding + 85;
                 int marginBottom = 45;
@@ -920,12 +889,10 @@ namespace epos
                     Math.Max(420, h - top - marginBottom)
                 );
 
-                
                 UpdateReceiptText();
             }
             else
             {
-                
                 homeRoot.Visible = false;
 
                 int panelTop = topPadding + 60;
@@ -936,7 +903,6 @@ namespace epos
                 currentPanel.Visible = true;
                 currentPanel.BringToFront();
 
-                
                 btnHome.BringToFront();
                 btnSettings.BringToFront();
                 btnAddItem.BringToFront();
